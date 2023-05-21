@@ -1,0 +1,120 @@
+# serverless.yml
+
+service: rave-geo-api
+
+provider:
+  name: aws
+  apiGateway:
+    shouldStartNameWithService: true
+    binaryMediaTypes:
+      - 'multipart/form-data'
+  runtime: python3.9
+  stage: ${opt:stage, 'dev'}
+  region: us-east-1
+  timeout: 900
+
+plugins:
+  - serverless-wsgi
+  - serverless-api-gateway-throttling
+  - serverless-python-requirements
+resources:
+  Resources:
+    GatewayResponseDefault4XX:
+      Type: 'AWS::ApiGateway::GatewayResponse'
+      Properties:
+        ResponseParameters:
+         gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+         gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+        ResponseType: DEFAULT_4XX
+        RestApiId:
+          Ref: 'ApiGatewayRestApi'
+    RaveGeoTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: raveGeo
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: status_date
+            AttributeType: N
+          - AttributeName: geohash_6
+            AttributeType: S
+          - AttributeName: geohash_7
+            AttributeType: S
+          - AttributeName: geohash_8
+            AttributeType: S
+          - AttributeName: status
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+          - AttributeName: status_date
+            KeyType: RANGE
+        GlobalSecondaryIndexes:
+          - IndexName: geohash_6
+            KeySchema:
+              - AttributeName: geohash_6
+                KeyType: HASH
+          - IndexName: geohash_7
+            KeySchema:
+              - AttributeName: geohash_7
+                KeyType: HASH
+          - IndexName: geohash_8
+            KeySchema:
+              - AttributeName: geohash_8
+                KeyType: HASH
+          - IndexName: status_age
+            KeySchema:
+              - AttributeName: status
+                KeyType: HASH
+              - AttributeName: status_date
+                KeyType: RANGE
+      ProvisionedThroughput:
+            ReadCapacityUnits: 1
+            WriteCapacityUnits: 1
+      BillingMode: PAY_PER_REQUEST
+#package:
+#  individually: true
+
+custom:
+  env:
+    dev:
+      roleEnv: 'dev'
+      memorySize: 128
+      lambda_role: arn:aws:iam::621709793940:role/rave-api-role
+      environment:
+        LOG_LEVEL: INFO
+  wsgi:
+    app: app.APP
+
+  apiGatewayThrottling:
+      maxRequestsPerSecond: 10000
+      maxConcurrentRequests: 5000
+
+
+functions:
+  rave-geo-api:
+    name: rave-geo-api-${self:provider.stage}
+    handler: wsgi_handler.handler
+    memorySize: ${self:custom.env.${self:provider.stage}.memorySize}
+    role: ${self:custom.env.${self:provider.stage}.lambda_role}
+    environment:
+        ENVIRONMENT: ${self:custom.env.${self:provider.stage}.roleEnv}
+        LOG_LEVEL: ${self:custom.env.${self:provider.stage}.environment.LOG_LEVEL}
+    events:
+      - http:
+          path: /
+          method: ANY
+          cors: true
+      - http:
+          path: "{proxy+}"
+          method: ANY
+          cors: true
+      - http:
+          path: '/api/'
+          method: ANY
+          cors: true
+      - http:
+          path: '/geolocation/coordinates/{proxy+}'
+          method: ANY
+          cors: true
