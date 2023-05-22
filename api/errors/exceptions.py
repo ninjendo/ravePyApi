@@ -8,51 +8,45 @@ class AuthError(Exception):
         self.status_code = status_code
 
 
-class PropertyNotFoundError(Exception):
+class CustomException(Exception):
     """Missing property error."""
 
-    def __init__(self, error, status_code):
-        """Initializes AuthError."""
-        super(PropertyNotFoundError, self).__init__(error)
-        self.error = error
-        self.status_code = status_code
+    def __init__(self, message, status_code=None, payload=None):
+        Exception.__init__(self)
+        self.message = message
+        if status_code is not None:
+            self.status_code = status_code
+        self.payload = payload
+
+    def to_dict(self):
+        rv = dict(self.payload or ())
+        rv['message'] = self.message
+        return rv
 
 
-class CoordinatesNotFoundError(Exception):
+class PropertyNotFoundError(CustomException):
+    """Missing property error."""
+    pass
+
+
+class CoordinatesNotFoundError(CustomException):
     """Missing Coordinates error."""
-
-    def __init__(self, error, status_code):
-        """Initializes AuthError."""
-        super(CoordinatesNotFoundError, self).__init__(error)
-        self.error = error
-        self.status_code = status_code
+    pass
 
 
-class InvalidPropertyDataError(Exception):
+class InvalidPropertyDataError(CustomException):
     """Invalid property data."""
 
-    def __init__(self, error, status_code):
-        """Initializes AuthError."""
-        super(InvalidPropertyDataError, self).__init__(error)
-        self.error = error
-        self.status_code = status_code
+    pass
 
 
-class RequestInvalidError(Exception):
+class RequestInvalidError(CustomException):
     """Invalid request."""
 
-    def __init__(self, error, status_code):
-        """Initializes AuthError."""
-        super(RequestInvalidError, self).__init__(error)
-        self.error = error
-        self.status_code = status_code
+    pass
 
 
-class MissingAddressError(Exception):
+class MissingAddressError(CustomException):
     """Missing postal address error."""
 
-    def __init__(self, error, status_code):
-        """Initializes AuthError."""
-        super(MissingAddressError, self).__init__(error)
-        self.error = error
-        self.status_code = status_code
+    pass
