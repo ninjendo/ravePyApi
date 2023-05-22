@@ -4,31 +4,30 @@
 - Install [WSL](https://learn.microsoft.com/en-us/windows/wsl/install-manual#step-4---download-the-linux-kernel-update-package)
 - You will need to have Docker installed for local development.
 
-##Install Serverless Framework
+## Install Serverless Framework
 If you don’t already have Node.js on your machine, [install it](https://nodejs.org/) first.
 
 ```bash
 npm init -f
 npm install --save-dev serverless-wsgi serverless-python-requirements serverless-api-gateway-throttling
 npm install -g serverless
-serverless plugin install -n serverless-python-requirements
 ```
 
-####To uninstall serverless
+#### To uninstall serverless
 > npm uninstall -g serverless
 
-####Test locally
+#### Test locally
 > sls wsgi serve
 or 
 > python app.py
 You can view swagger locally at http://127.0.0.1:5000/api
-####Deploy in AWS
+#### Deploy in AWS
 > sls deploy
 
-####Delete stack
+#### Delete stack
 > sls remove
 
-####View logs
+#### View logs
 >sls logs -f app
 
 #### Troubleshoot

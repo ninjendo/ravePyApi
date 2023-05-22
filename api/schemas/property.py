@@ -1,5 +1,15 @@
 from marshmallow import Schema
-from marshmallow.fields import String, Integer, Raw, Dict, Date, Nested
+from marshmallow.fields import String, Integer, Raw, Dict, Date, Nested, List
+
+from api.schemas.geolocation import RadarAddress
+
+
+class RawProperty(Schema):
+    data = Raw()
+
+
+class RawProperties(Schema):
+    data = List(Nested(RawProperty))
 
 
 class Address(Schema):
@@ -13,14 +23,15 @@ class Address(Schema):
 
 class Property(Schema):
     id = String()
-    address = Nested(Address)
-    list_price = Integer()
-    arv = Integer()
-    property_condition = String()
-    market_status = String()
-    status_modified_date = Date()
-    longitude = String()
-    latitude = String()
+    address = Nested(RadarAddress)
+    condition = String()
+    status = String()
+    details = String()
+    status_date = Date()
     geo_hash_3 = String()
     geo_hash_5 = String()
     geo_hash_10 = String()
+
+
+class Properties(Schema):
+    properties = List(Nested(Property))

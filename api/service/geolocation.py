@@ -26,6 +26,7 @@ def get_coordinates(address):
 
     if data['meta']['code'] == 200:
         addr = data['addresses'][0]
-        return {"address": addr, "latitude": addr['latitude'], "longitude": addr['longitude']}
+        del addr['geometry']
+        return addr
     else:
         raise CoordinatesNotFoundError(address)

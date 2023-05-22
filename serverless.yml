@@ -33,7 +33,9 @@ resources:
       Properties:
         TableName: raveGeo
         AttributeDefinitions:
-          - AttributeName: id
+          - AttributeName: pk
+            AttributeType: S
+          - AttributeName: sk
             AttributeType: S
           - AttributeName: status_date
             AttributeType: N
@@ -45,25 +47,45 @@ resources:
             AttributeType: S
           - AttributeName: status
             AttributeType: S
+          - AttributeName: alt_key
+            AttributeType: S
+          - AttributeName: addr_key
+            AttributeType: S
         KeySchema:
-          - AttributeName: id
+          - AttributeName: pk
             KeyType: HASH
-          - AttributeName: status_date
+          - AttributeName: sk
             KeyType: RANGE
         GlobalSecondaryIndexes:
-          - IndexName: geohash_6
+          - IndexName: alt-key
+            KeySchema:
+              - AttributeName: alt_key
+                KeyType: HASH
+              - AttributeName: status_date
+                KeyType: RANGE
+          - IndexName: status-addr-key
+            KeySchema:
+              - AttributeName: status
+                KeyType: HASH
+              - AttributeName: addr_key
+                KeyType: RANGE
+          - IndexName: geohash-6
             KeySchema:
               - AttributeName: geohash_6
                 KeyType: HASH
-          - IndexName: geohash_7
+              - AttributeName: geohash_7
+                KeyType: RANGE
+          - IndexName: geohash-7
             KeySchema:
               - AttributeName: geohash_7
                 KeyType: HASH
-          - IndexName: geohash_8
+              - AttributeName: geohash_8
+                KeyType: RANGE
+          - IndexName: geohash-8
             KeySchema:
               - AttributeName: geohash_8
                 KeyType: HASH
-          - IndexName: status_age
+          - IndexName: status-age
             KeySchema:
               - AttributeName: status
                 KeyType: HASH
