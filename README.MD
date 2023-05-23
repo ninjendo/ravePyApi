@@ -1,4 +1,8 @@
 # Rave Python Serverless API
+!! ON-GOING PROJECT !!
+This is an extension for the project, [ravePads](https://github.com/ninjendo/ravepads). It is responsible for performing CRUD operations against DynamoDB and implementing geocoding.
+
+Tech stack: Python, DynamoDB, Serverless Framework (IAC)
 
 ## Pre-req if using windows
 - Install [WSL](https://learn.microsoft.com/en-us/windows/wsl/install-manual#step-4---download-the-linux-kernel-update-package)
