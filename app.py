@@ -28,7 +28,7 @@ APP.config['API_SPEC_OPTIONS'] = {
                 'apiKeyAuth': {
                     'type': 'apiKey',
                     'in': 'header',
-                    'name': 'IdToken'
+                    'name': 'x-api-key'
                 }
             }
     }

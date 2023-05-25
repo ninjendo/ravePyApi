@@ -10,8 +10,12 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "serverless-add-api-key": "^4.2.1",
     "serverless-api-gateway-throttling": "^2.0.3",
     "serverless-python-requirements": "^6.0.0",
     "serverless-wsgi": "^3.0.2"
+  },
+  "dependencies": {
+    "serverless-dynamodb-local": "^0.2.40"
   }
 }

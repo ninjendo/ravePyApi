@@ -4,19 +4,34 @@ service: rave-geo-api
 
 provider:
   name: aws
+  logs:
+    restApi: true
+    role: arn:aws:iam::621709793940:role/rave-api-gteway-role
   apiGateway:
     shouldStartNameWithService: true
     binaryMediaTypes:
       - 'multipart/form-data'
+    apiKeys:
+      - basic:
+          - basicPlanKey
+    usagePlan:
+      - basic:
+          quota:
+            limit: 500
+            period: MONTH
+          throttle:
+            rateLimit: 5
+            burstLimit: 20
   runtime: python3.9
   stage: ${opt:stage, 'dev'}
   region: us-east-1
-  timeout: 900
 
 plugins:
   - serverless-wsgi
   - serverless-api-gateway-throttling
   - serverless-python-requirements
+  - serverless-add-api-key
+
 resources:
   Resources:
     GatewayResponseDefault4XX:
@@ -63,40 +78,52 @@ resources:
                 KeyType: HASH
               - AttributeName: status_date
                 KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
           - IndexName: status-addr-key
             KeySchema:
               - AttributeName: status
                 KeyType: HASH
               - AttributeName: addr_key
                 KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
           - IndexName: geohash-6
             KeySchema:
               - AttributeName: geohash_6
                 KeyType: HASH
               - AttributeName: geohash_7
                 KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
           - IndexName: geohash-7
             KeySchema:
               - AttributeName: geohash_7
                 KeyType: HASH
               - AttributeName: geohash_8
                 KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
           - IndexName: geohash-8
             KeySchema:
               - AttributeName: geohash_8
                 KeyType: HASH
+            Projection:
+              ProjectionType: ALL
           - IndexName: status-age
             KeySchema:
               - AttributeName: status
                 KeyType: HASH
               - AttributeName: status_date
                 KeyType: RANGE
-      ProvisionedThroughput:
-            ReadCapacityUnits: 1
-            WriteCapacityUnits: 1
-      BillingMode: PAY_PER_REQUEST
-#package:
-#  individually: true
+            Projection:
+              ProjectionType: ALL
+        BillingMode: PAY_PER_REQUEST
+
+package:
+  patterns:
+    - '!node_modules/**'
+    - '!venv/**'
 
 custom:
   env:
@@ -108,6 +135,12 @@ custom:
         LOG_LEVEL: INFO
   wsgi:
     app: app.APP
+
+  pythonRequirements:
+    dockerizePip: non-linux
+    useDownloadCache: false
+    useStaticCache: false
+    slim: true
 
   apiGatewayThrottling:
       maxRequestsPerSecond: 10000
@@ -137,6 +170,12 @@ functions:
           method: ANY
           cors: true
       - http:
-          path: '/geolocation/coordinates/{proxy+}'
+          path: '/geolocation/{proxy+}'
           method: ANY
           cors: true
+          private: true
+      - http:
+          path: '/properties/'
+          method: ANY
+          cors: true
+          private: true
